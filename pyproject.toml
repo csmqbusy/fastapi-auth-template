@@ -1,7 +1,7 @@
 [project]
-name = "fastapi-template"
+name = "personal_finance"
 version = "0.1.0"
-description = "Template for quick start of fastapi application"
+description = "Personal finance app"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
