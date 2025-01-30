@@ -26,7 +26,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/login",
+    "/login/",
     summary="Authenticate a user",
 )
 async def auth_user_issue_jwt(
@@ -94,7 +94,7 @@ async def refresh_access_token(
     )
 
 
-@router.get("/me")
+@router.get("/me/")
 async def auth_user_check_info(
     user: SUserSignUp = Depends(get_active_auth_user_info),
 ):
