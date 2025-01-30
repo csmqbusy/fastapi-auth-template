@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from .v1 import router_v1
 
 
-router = APIRouter()
+__all__ = [
+    "router_v1",
+]
