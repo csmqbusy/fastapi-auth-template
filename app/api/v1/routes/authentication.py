@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies.authentication import (
     validate_credentials,
     get_refresh_token_payload,
+    get_active_auth_user_info,
 )
 from app.auth.utils import (
     hash_password,
@@ -91,3 +92,13 @@ async def refresh_access_token(
         httponly=True,
         samesite="lax"
     )
+
+
+@router.get("/me")
+async def auth_user_check_info(
+    user: SUserSignUp = Depends(get_active_auth_user_info),
+):
+    return {
+        "username": user.username,
+        "email": user.email,
+    }
