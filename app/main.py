@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from app.api import router as api_router
+from app.api import router_v1
 from app.core.config import settings
 from app.db import close_db
 
@@ -20,10 +20,10 @@ main_app = FastAPI(
     lifespan=lifespan,
 )
 main_app.include_router(
-        api_router,
-        prefix=settings.api.prefix
+    router_v1,
+    prefix=settings.api.prefix_v1,
+    tags=["v1"]
 )
-
 
 if __name__ == '__main__':
     uvicorn.run(
