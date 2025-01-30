@@ -21,7 +21,7 @@ class RunConfig(BaseModel):
 
 
 class ApiPrefix(BaseModel):
-    prefix: str = "/api"
+    prefix_v1: str = "/api/v1"
 
 
 class DatabaseConfig(BaseModel):
@@ -30,6 +30,17 @@ class DatabaseConfig(BaseModel):
     echo_pool: bool = False
     pool_size: int = 50
     max_overflow: int = 10
+
+
+class JWTAuth(BaseModel):
+    certs_path: Path = get_correct_cwd() / "certs"
+    access_private_key_path: Path = certs_path / "access_private.pem"
+    access_public_key_path: Path = certs_path / "access_public.pem"
+    refresh_private_key_path: Path = certs_path / "refresh_private.pem"
+    refresh_public_key_path: Path = certs_path / "refresh_public.pem"
+    algorithm: str = "RS256"
+    access_token_expires_sec: int = 900
+    refresh_token_expires_days: int = 60
 
 
 class Settings(BaseSettings):
@@ -42,6 +53,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
+    auth: JWTAuth = JWTAuth()
 
 
 settings = Settings()
