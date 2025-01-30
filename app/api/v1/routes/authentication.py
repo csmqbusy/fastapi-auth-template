@@ -7,10 +7,14 @@ from fastapi import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies.authentication import validate_credentials
+from app.api.dependencies.authentication import (
+    validate_credentials,
+    get_refresh_token_payload,
+)
 from app.auth.utils import (
     hash_password,
-    create_access_token, create_refresh_token,
+    create_access_token,
+    create_refresh_token,
 )
 from app.db import get_db_session
 from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
@@ -32,12 +36,17 @@ async def auth_user_issue_jwt(
     access_token = create_access_token(payload)
     refresh_token = create_refresh_token(payload)
     response.set_cookie(
-        key="access_token", value=access_token, httponly=True, secure=True,
+        key="access_token",
+        value=access_token,
+        httponly=True,
         samesite="lax"
-        )
+    )
     response.set_cookie(
-        key="refresh_token", value=refresh_token, httponly=True
-        )
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        samesite="lax"
+    )
     return {"sign_in": "Success!"}
 
 
@@ -63,3 +72,22 @@ async def sign_up_user(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already exists.",
         )
+
+
+@router.post(
+    "/refresh/",
+    summary="Release a new access token using refresh",
+    response_model_exclude_none=True,
+)
+async def refresh_access_token(
+    response: Response,
+    payload: dict = Depends(get_refresh_token_payload),
+):
+    access_token_payload = {"sub": payload.get("sub")}
+    access_token = create_access_token(access_token_payload)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        samesite="lax"
+    )
