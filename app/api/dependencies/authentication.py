@@ -1,7 +1,6 @@
-from fastapi import Form, Depends, HTTPException
+from fastapi import Form, Depends
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 from starlette.requests import Request
 
 from app.auth.utils import (
@@ -12,7 +11,13 @@ from app.auth.utils import (
 from app.db import get_db_session
 from app.schemas.user import SUserSignUp
 from app.services.user_service import get_user_by_username
-from app.api.exceptions.authentication import InvalidCredentialsException
+from app.api.exceptions.authentication import (
+    InvalidCredentialsError,
+    TokenNotFoundError,
+    InvalidTokenException,
+    UserNotFoundError,
+    UserInactiveError,
+)
 
 
 async def validate_credentials(
@@ -22,41 +27,29 @@ async def validate_credentials(
 ):
     user = await get_user_by_username(username, db_session)
     if not user:
-        raise InvalidCredentialsException()
+        raise InvalidCredentialsError()
     if not verify_password(password, user.password):
-        raise InvalidCredentialsException()
+        raise InvalidCredentialsError()
     return user
 
 
 async def get_refresh_token_payload(request: Request) -> dict:
     if not (refresh_token := request.cookies.get("refresh_token")):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token not found.",
-        )
+        raise TokenNotFoundError()
     try:
         payload = decode_refresh_token(refresh_token)
     except InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token.",
-        )
+        raise InvalidTokenException()
     return payload
 
 
 async def get_access_token_payload(request: Request) -> dict:
     if not (access_token := request.cookies.get("access_token")):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token not found.",
-        )
+        raise TokenNotFoundError()
     try:
         payload = decode_access_token(access_token)
     except InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token.",
-        )
+        raise InvalidTokenException()
     return payload
 
 
@@ -68,10 +61,7 @@ async def get_auth_user_info(
     user = await get_user_by_username(username, db_session)
     if user:
         return user
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="User not found.",
-    )
+    raise UserNotFoundError()
 
 
 async def get_active_auth_user_info(
@@ -79,7 +69,4 @@ async def get_active_auth_user_info(
 ):
     if user.active:
         return user
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="User inactive",
-    )
+    raise UserInactiveError()
