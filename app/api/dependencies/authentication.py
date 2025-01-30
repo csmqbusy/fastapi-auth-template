@@ -58,3 +58,18 @@ async def get_access_token_payload(request: Request) -> dict:
         )
     return payload
 
+
+async def get_auth_user_info(
+    payload: dict = Depends(get_access_token_payload),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    username = payload.get("sub")
+    user = await get_user_by_username(username, db_session)
+    if user:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="User not found.",
+    )
+
+
