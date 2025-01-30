@@ -16,8 +16,8 @@ async def lifespan(app: FastAPI):
 
 
 main_app = FastAPI(
-        default_response_class=ORJSONResponse,
-        lifespan=lifespan,
+    default_response_class=ORJSONResponse,
+    lifespan=lifespan,
 )
 main_app.include_router(
         api_router,
@@ -27,8 +27,8 @@ main_app.include_router(
 
 if __name__ == '__main__':
     uvicorn.run(
-            "main:main_app",
-            host=settings.run.host,
-            port=settings.run.port,
-            reload=True,
+        "main:main_app",
+        host=settings.run.host,
+        port=settings.run.port,
+        reload=True,
     )

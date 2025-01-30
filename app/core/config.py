@@ -4,7 +4,7 @@ from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def get_correct_path(sources_dir_name: str = "app") -> Path:
+def get_correct_cwd(sources_dir_name: str = "app") -> Path:
     """
     This function is needed to correctly launch the application from
     the app/main.py file and alembic commands from the project root folder.
@@ -34,7 +34,7 @@ class DatabaseConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-            env_file=get_correct_path("app") / ".env.dev",
+            env_file=get_correct_cwd() / ".env.dev",
             case_sensitive=False,
             env_nested_delimiter="__",
     )
