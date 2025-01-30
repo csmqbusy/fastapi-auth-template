@@ -29,7 +29,8 @@ router = APIRouter()
     "/login/",
     summary="Authenticate a user",
 )
-async def auth_user_issue_jwt(
+async def login(
+    request: Request,
     response: Response,
     user: SUserSignIn = Depends(validate_credentials),
 ):
@@ -78,7 +79,6 @@ async def sign_up_user(
 @router.post(
     "/refresh/",
     summary="Release a new access token using refresh",
-    response_model_exclude_none=True,
 )
 async def refresh_access_token(
     response: Response,
@@ -94,8 +94,11 @@ async def refresh_access_token(
     )
 
 
-@router.get("/me/")
-async def auth_user_check_info(
+@router.get(
+    "/me/",
+    summary="Get current user info",
+)
+async def auth_user_get_info(
     user: SUserSignUp = Depends(get_active_auth_user_info),
 ):
     return {
