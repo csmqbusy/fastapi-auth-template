@@ -10,6 +10,7 @@ from app.auth.utils import (
     decode_access_token,
 )
 from app.db import get_db_session
+from app.schemas.user import SUserSignUp
 from app.services.user_service import get_user_by_username
 from app.api.exceptions.authentication import InvalidCredentialsException
 
@@ -73,3 +74,12 @@ async def get_auth_user_info(
     )
 
 
+async def get_active_auth_user_info(
+    user: SUserSignUp = Depends(get_auth_user_info),
+):
+    if user.active:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="User inactive",
+    )
