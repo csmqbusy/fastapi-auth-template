@@ -17,10 +17,10 @@ class RefreshTokenRepository(BaseRepository[RefreshTokenModel]):
         user_id: int,
         device_info: SDeviceInfo,
     ) -> list[RefreshTokenModel]:
-        device_info = device_info.model_dump()
+        device_info_dict = device_info.model_dump()
         query = select(self.model).filter(
             self.model.user_id == user_id,
-            cast(self.model.device_info, JSONB).contains(device_info),
+            cast(self.model.device_info, JSONB).contains(device_info_dict),
         )
         result = await session.execute(query)
         same_device_tokens = result.scalars().all()
