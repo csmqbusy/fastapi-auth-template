@@ -6,8 +6,8 @@ from app.exceptions.user import (
     EmailAlreadyExists,
 )
 from app.models import UserModel
-from app.repositories.user import get_user_by_params, add_user
-from app.schemas.user import SUserSignUp
+from app.repositories import user_repo
+from app.schemes.user import SUserSignUp
 
 
 async def create_user(user: SUserSignUp, session: AsyncSession) -> None:
@@ -16,14 +16,14 @@ async def create_user(user: SUserSignUp, session: AsyncSession) -> None:
     if not (await _check_unique_email(user.email, session)):
         raise EmailAlreadyExists
 
-    await add_user(user, session)
+    await user_repo.add(session, user.model_dump())
 
 
 async def get_user_by_username(
     username: str,
     session: AsyncSession,
 ) -> UserModel | None:
-    return await get_user_by_params(session, {"username": username})
+    return await user_repo.get_by_filter(session, {"username": username})
 
 
 async def _check_unique_username(username: str, session: AsyncSession) -> bool:
@@ -34,7 +34,7 @@ async def _check_unique_username(username: str, session: AsyncSession) -> bool:
 
 
 async def _check_unique_email(email: EmailStr, session: AsyncSession) -> bool:
-    user = await get_user_by_params(session, {"email": email})
+    user = await user_repo.get_by_filter(session, {"email": email})
     if user is None:
         return True
     return False
