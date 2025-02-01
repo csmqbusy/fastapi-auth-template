@@ -39,3 +39,19 @@ class UserInactiveError(HTTPException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User inactive.",
         )
+
+
+class UsernameAlreadyExistsError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username already exists.",
+        )
+
+
+class EmailAlreadyExistsError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists.",
+        )

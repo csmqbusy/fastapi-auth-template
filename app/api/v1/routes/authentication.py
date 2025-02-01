@@ -11,6 +11,9 @@ from app.api.dependencies.authentication import (
     validate_credentials,
     get_refresh_token_payload,
     get_active_auth_user_info,
+from app.api.exceptions.authentication import (
+    UsernameAlreadyExistsError,
+    EmailAlreadyExistsError,
 )
 from app.auth.utils import (
     hash_password,
@@ -65,15 +68,9 @@ async def sign_up_user(
     try:
         await create_user(user, db_session)
     except UsernameAlreadyExists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already exists.",
-        )
+        raise UsernameAlreadyExistsError()
     except EmailAlreadyExists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already exists.",
-        )
+        raise EmailAlreadyExistsError()
 
 
 @router.post(
