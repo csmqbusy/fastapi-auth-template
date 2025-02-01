@@ -100,6 +100,17 @@ async def refresh_access_token(
     )
 
 
+@router.post(
+    "/logout/",
+    summary="Finish the user session",
+)
+async def logout(
+    response: Response,
+):
+    response.delete_cookie(key="refresh_token")
+    response.delete_cookie(key="access_token")
+
+
 @router.get(
     "/me/",
     summary="Get current user info",
