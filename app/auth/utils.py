@@ -40,7 +40,8 @@ def _create_jwt(
 
 def create_access_token(
     payload: dict,
-    token_type: str = TokenType.ACCESS,
+    iat: int,
+    expire: int,
     token_type: TokenType = TokenType.ACCESS,
     private_key: str = settings.auth.access_private_key_path.read_text(),
     expire: int = settings.auth.access_token_expires_sec,
@@ -55,7 +56,8 @@ def create_access_token(
 
 def create_refresh_token(
     payload: dict,
-    token_type: str = TokenType.REFRESH,
+    iat: int,
+    expire: int,
     token_type: TokenType = TokenType.REFRESH,
     private_key: str = settings.auth.refresh_private_key_path.read_text(),
     expire: int = settings.auth.refresh_token_expires_days,
@@ -102,3 +104,15 @@ def hash_password(password: str) -> bytes:
 
 def verify_password(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode(), hashed_password)
+
+
+def get_token_iat_and_exp(token_type: TokenType) -> dict[str, int]:
+    now = int(datetime.now(UTC).timestamp())
+    if token_type == TokenType.ACCESS:
+        time_to_live = settings.auth.access_token_expires_sec
+    elif token_type == TokenType.REFRESH:
+        time_to_live = settings.auth.refresh_token_expires_days * SECONDS_IN_HOUR
+    else:
+        raise ValueError("Invalid token type")
+    expire = now + time_to_live
+    return {"iat": now, "exp": expire}
