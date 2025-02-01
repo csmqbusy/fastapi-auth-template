@@ -25,8 +25,9 @@ from app.auth.utils import (
 )
 from app.db import get_db_session
 from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
-from app.schemas.user import SUserSignUp, SUserSignIn
-from app.services.user_service import create_user
+from app.models import UserModel
+from app.schemes.user import SUserSignUp
+from app.services.user import create_user
 
 router = APIRouter()
 
@@ -38,7 +39,9 @@ router = APIRouter()
 async def login(
     request: Request,
     response: Response,
-    user: SUserSignIn = Depends(validate_credentials),
+    user: UserModel = Depends(validate_credentials),
+    device_info: SDeviceInfo = Depends(get_device_info),
+    db_session: AsyncSession = Depends(get_db_session),
 ):
     payload = {"sub": user.username}
     access_token = create_access_token(payload)
