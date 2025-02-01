@@ -70,3 +70,12 @@ async def get_active_auth_user_info(
     if user.active:
         return user
     raise UserInactiveError()
+
+
+async def get_device_info(request: Request) -> SDeviceInfo:
+    user_agent = request.headers.get("user-agent")
+    user_ip = request.client.host if request.client else None
+    return SDeviceInfo(
+        user_agent=user_agent,
+        ip_address=user_ip,
+    )

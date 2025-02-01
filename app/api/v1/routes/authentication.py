@@ -11,6 +11,9 @@ from app.api.dependencies.authentication import (
     validate_credentials,
     get_refresh_token_payload,
     get_active_auth_user_info,
+    get_device_info,
+    get_valid_refresh_token_payload,
+)
 from app.api.exceptions.authentication import (
     UsernameAlreadyExistsError,
     EmailAlreadyExistsError,
