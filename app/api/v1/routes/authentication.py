@@ -137,9 +137,10 @@ async def logout(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        await delete_refresh_token_from_db(db_session, refresh_token)
     response.delete_cookie(key="refresh_token")
     response.delete_cookie(key="access_token")
-    await delete_refresh_token_from_db(db_session, refresh_token)
 
 
 @router.get(
