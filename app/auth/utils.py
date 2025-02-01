@@ -17,7 +17,7 @@ class TokenType(StrEnum):
 
 def _create_jwt(
     payload: dict,
-    token_type: str,
+    token_type: TokenType,
     private_key: str,
     expire: int,
     algorithm: str = settings.auth.algorithm,
@@ -41,6 +41,7 @@ def _create_jwt(
 def create_access_token(
     payload: dict,
     token_type: str = TokenType.ACCESS,
+    token_type: TokenType = TokenType.ACCESS,
     private_key: str = settings.auth.access_private_key_path.read_text(),
     expire: int = settings.auth.access_token_expires_sec,
 ) -> str:
@@ -55,6 +56,7 @@ def create_access_token(
 def create_refresh_token(
     payload: dict,
     token_type: str = TokenType.REFRESH,
+    token_type: TokenType = TokenType.REFRESH,
     private_key: str = settings.auth.refresh_private_key_path.read_text(),
     expire: int = settings.auth.refresh_token_expires_days,
 ) -> str:
