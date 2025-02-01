@@ -10,7 +10,9 @@ from app.auth.utils import (
 )
 from app.db import get_db_session
 from app.models import UserModel
+from app.schemes.device_info import SDeviceInfo
 from app.schemes.user import SUserSignUp
+from app.services.refresh_token import check_token_in_db
 from app.services.user import get_user_by_username
 from app.api.exceptions.authentication import (
     InvalidCredentialsError,
@@ -34,9 +36,20 @@ async def validate_credentials(
     return user
 
 
-async def get_refresh_token_payload(request: Request) -> dict:
+async def validate_refresh_token(
+    request: Request,
+    db_session: AsyncSession = Depends(get_db_session),
+) -> str:
     if not (refresh_token := request.cookies.get("refresh_token")):
         raise TokenNotFoundError()
+    if not await check_token_in_db(db_session, refresh_token):
+        raise InvalidTokenException()
+    return refresh_token
+
+
+async def get_valid_refresh_token_payload(
+    refresh_token: str = Depends(validate_refresh_token),
+) -> dict:
     try:
         payload = decode_refresh_token(refresh_token)
     except InvalidTokenError:

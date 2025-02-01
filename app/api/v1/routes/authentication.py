@@ -1,7 +1,6 @@
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
     status,
     Response,
 )
@@ -9,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.authentication import (
     validate_credentials,
-    get_refresh_token_payload,
     get_active_auth_user_info,
     get_device_info,
     get_valid_refresh_token_payload,
@@ -88,7 +86,7 @@ async def sign_up_user(
 )
 async def refresh_access_token(
     response: Response,
-    payload: dict = Depends(get_refresh_token_payload),
+    payload: dict = Depends(get_valid_refresh_token_payload),
 ):
     access_token_payload = {"sub": payload.get("sub")}
     access_token = create_access_token(access_token_payload)
