@@ -16,11 +16,13 @@ async def add_refresh_token_to_db(
     expires_at: int,
     device_info: SDeviceInfo,
 ) -> None:
+
     all_user_sessions = await _get_all_user_auth_sessions(session, user_id)
     if len(all_user_sessions) > 4:
         await _delete_all_user_auth_sessions(session, all_user_sessions)
 
     await _delete_same_device_auth_sessions(session, user_id, device_info)
+
     token_scheme = SRefreshToken(
         user_id=user_id,
         token_hash=_hash_token(token),
