@@ -101,4 +101,5 @@ async def delete_refresh_token_from_db(
         session,
         {"token_hash": _hash_token(token)},
     )
-    await refresh_token_repo.delete(session, token_in_db.id)
+    if token_in_db:
+        await refresh_token_repo.delete(session, token_in_db.id)
