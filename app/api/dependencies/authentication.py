@@ -72,9 +72,10 @@ async def get_auth_user_info(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     username = payload.get("sub")
-    user = await get_user_by_username(username, db_session)
-    if user:
-        return user
+    if username:
+        user = await get_user_by_username(username, db_session)
+        if user:
+            return user
     raise UserNotFoundError()
 
 
