@@ -9,8 +9,9 @@ from app.auth.utils import (
     decode_access_token,
 )
 from app.db import get_db_session
-from app.schemas.user import SUserSignUp
-from app.services.user_service import get_user_by_username
+from app.models import UserModel
+from app.schemes.user import SUserSignUp
+from app.services.user import get_user_by_username
 from app.api.exceptions.authentication import (
     InvalidCredentialsError,
     TokenNotFoundError,
