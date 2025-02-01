@@ -21,6 +21,7 @@ async def add_refresh_token_to_db(
         for auth_session in all_user_sessions:
             await refresh_token_repo.delete(session, auth_session.id)
     await _override_same_device_auth_sessions(session, user_id, device_info)
+    await _delete_same_device_auth_sessions(session, user_id, device_info)
     token_scheme = SRefreshToken(
         user_id=user_id,
         token_hash=_hash_token(token),
@@ -36,7 +37,7 @@ def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-async def _override_same_device_auth_sessions(
+async def _delete_same_device_auth_sessions(
     session: AsyncSession,
     user_id: int,
     device_info: SDeviceInfo,
