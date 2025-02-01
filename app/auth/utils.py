@@ -19,15 +19,14 @@ def _create_jwt(
     payload: dict,
     token_type: TokenType,
     private_key: str,
+    iat: int,
     expire: int,
     algorithm: str = settings.auth.algorithm,
 ) -> str:
     to_encode = payload.copy()
-    now = int(datetime.now(UTC).timestamp())
-    expire_time = now + expire
     to_encode.update(
-        iat=now,
-        exp=expire_time,
+        iat=iat,
+        exp=expire,
         token_type=token_type,
     )
     encoded_jwt = jwt.encode(
@@ -44,12 +43,12 @@ def create_access_token(
     expire: int,
     token_type: TokenType = TokenType.ACCESS,
     private_key: str = settings.auth.access_private_key_path.read_text(),
-    expire: int = settings.auth.access_token_expires_sec,
 ) -> str:
     return _create_jwt(
         payload=payload,
         token_type=token_type,
         private_key=private_key,
+        iat=iat,
         expire=expire,
     )
 
@@ -60,14 +59,13 @@ def create_refresh_token(
     expire: int,
     token_type: TokenType = TokenType.REFRESH,
     private_key: str = settings.auth.refresh_private_key_path.read_text(),
-    expire: int = settings.auth.refresh_token_expires_days,
 ) -> str:
-    expire_secs = expire * SECONDS_IN_HOUR
     return _create_jwt(
         payload=payload,
         token_type=token_type,
         private_key=private_key,
-        expire=expire_secs,
+        iat=iat,
+        expire=expire,
     )
 
 
