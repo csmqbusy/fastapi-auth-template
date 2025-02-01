@@ -3,6 +3,7 @@ from fastapi import (
     Depends,
     status,
     Response,
+    Request,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,7 +30,7 @@ from app.models import UserModel
 from app.schemes.device_info import SDeviceInfo
 from app.schemes.user import SUserSignUp
 from app.services.refresh_token import (
-    add_refresh_token_to_db,
+    add_refresh_token_to_db, delete_refresh_token_from_db,
 )
 from app.services.user import create_user
 
@@ -131,10 +132,14 @@ async def refresh_access_token(
     summary="Finish the user session",
 )
 async def logout(
+    request: Request,
     response: Response,
+    db_session: AsyncSession = Depends(get_db_session),
 ):
+    refresh_token = request.cookies.get("refresh_token")
     response.delete_cookie(key="refresh_token")
     response.delete_cookie(key="access_token")
+    await delete_refresh_token_from_db(db_session, refresh_token)
 
 
 @router.get(
