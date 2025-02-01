@@ -25,7 +25,7 @@ async def validate_credentials(
     username: str = Form(),
     password: str = Form(),
     db_session: AsyncSession = Depends(get_db_session)
-):
+) -> UserModel:
     user = await get_user_by_username(username, db_session)
     if not user:
         raise InvalidCredentialsError()
