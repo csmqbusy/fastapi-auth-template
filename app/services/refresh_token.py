@@ -17,10 +17,9 @@ async def add_refresh_token_to_db(
     device_info: SDeviceInfo,
 ) -> None:
     all_user_sessions = await _get_all_user_auth_sessions(session, user_id)
-    if len(all_user_sessions) >= 5:
-        for auth_session in all_user_sessions:
-            await refresh_token_repo.delete(session, auth_session.id)
-    await _override_same_device_auth_sessions(session, user_id, device_info)
+    if len(all_user_sessions) > 4:
+        await _delete_all_user_auth_sessions(session, all_user_sessions)
+
     await _delete_same_device_auth_sessions(session, user_id, device_info)
     token_scheme = SRefreshToken(
         user_id=user_id,
@@ -50,6 +49,14 @@ async def _delete_same_device_auth_sessions(
     if same_device_auth_sessions:
         for device in same_device_auth_sessions:
             await refresh_token_repo.delete(session, device.id)
+
+
+async def _delete_all_user_auth_sessions(
+    session: AsyncSession,
+    user_sessions: list[RefreshTokenModel],
+):
+    for auth_session in user_sessions:
+        await refresh_token_repo.delete(session, auth_session.id)
 
 
 async def _get_same_device_auth_sessions(
