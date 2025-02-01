@@ -56,4 +56,4 @@ class Settings(BaseSettings):
     auth: JWTAuth = JWTAuth()
 
 
-settings = Settings()
+settings = Settings()  # type: ignore
