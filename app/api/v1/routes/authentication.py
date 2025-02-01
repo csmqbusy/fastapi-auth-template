@@ -55,7 +55,10 @@ async def login(
         httponly=True,
         samesite="lax"
     )
-    return {"sign_in": "Success!"}
+
+    return {
+        "sign_in": "Success!",
+    }
 
 
 @router.post(
@@ -78,7 +81,7 @@ async def sign_up_user(
 
 @router.post(
     "/refresh/",
-    summary="Release a new access token using refresh",
+    summary="Release a new access token using refresh token",
 )
 async def refresh_access_token(
     response: Response,
