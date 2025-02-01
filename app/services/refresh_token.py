@@ -77,7 +77,7 @@ async def _get_same_device_auth_sessions(
 async def _get_all_user_auth_sessions(
     session: AsyncSession,
     user_id: int,
-):
+) -> list[RefreshTokenModel]:
     return await refresh_token_repo.get_all(session, dict(user_id=user_id))
 
 
