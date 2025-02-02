@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
+    test_db: DatabaseConfig
     auth: JWTAuth = JWTAuth()
 
 
