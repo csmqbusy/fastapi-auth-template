@@ -94,14 +94,15 @@ async def login(
 async def sign_up_user(
     user: SUserSignUp,
     db_session: AsyncSession = Depends(get_db_session),
-):
+) -> SUserShortInfo:
     user.password = hash_password(user.password.decode())
     try:
-        await create_user(user, db_session)
+        user_from_db = await create_user(user, db_session)
     except UsernameAlreadyExists:
         raise UsernameAlreadyExistsError()
     except EmailAlreadyExists:
         raise EmailAlreadyExistsError()
+    return SUserShortInfo.model_validate(user_from_db)
 
 
 @router.post(
