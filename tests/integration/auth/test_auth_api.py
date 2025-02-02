@@ -1,4 +1,4 @@
-from enum import StrEnum
+from enum import Enum
 
 import pytest
 from starlette import status
@@ -7,10 +7,10 @@ from starlette.testclient import TestClient
 from app.core.config import settings
 
 
-class RegistrationExpectedResponse(StrEnum):
-    CREATED = "created"
-    USERNAME_EXISTS = "username_exists"
-    EMAIL_EXISTS = "email_exists"
+class RegistrationExpectedResponse(Enum):
+    CREATED = 0
+    USERNAME_EXISTS = 1
+    EMAIL_EXISTS = 2
 
 
 @pytest.mark.parametrize(
