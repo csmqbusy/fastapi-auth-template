@@ -10,13 +10,14 @@ from app.repositories import user_repo
 from app.schemes.user import SUserSignUp
 
 
-async def create_user(user: SUserSignUp, session: AsyncSession) -> None:
+async def create_user(user: SUserSignUp, session: AsyncSession) -> UserModel:
     if not (await _check_unique_username(user.username, session)):
         raise UsernameAlreadyExists
     if not (await _check_unique_email(user.email, session)):
         raise EmailAlreadyExists
 
-    await user_repo.add(session, user.model_dump())
+    user = await user_repo.add(session, user.model_dump())
+    return user
 
 
 async def get_user_by_username(
