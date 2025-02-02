@@ -11,7 +11,6 @@ from app.auth.utils import (
 from app.db import get_db_session
 from app.models import UserModel
 from app.schemes.device_info import SDeviceInfo
-from app.schemes.user import SUserSignUp
 from app.services.refresh_token import check_token_in_db
 from app.services.user import get_user_by_username
 from app.api.exceptions.authentication import (
@@ -80,7 +79,7 @@ async def get_auth_user_info(
 
 
 async def get_active_auth_user_info(
-    user: SUserSignUp = Depends(get_auth_user_info),
+    user: UserModel = Depends(get_auth_user_info),
 ):
     if user.active:
         return user
