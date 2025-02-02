@@ -148,6 +148,6 @@ async def logout(
     summary="Get current user info",
 )
 async def auth_user_get_info(
-    user: SUserSignUp = Depends(get_active_auth_user_info),
+    user: UserModel = Depends(get_active_auth_user_info),
 ) -> SUserShortInfo:
     return SUserShortInfo.model_validate(user)
