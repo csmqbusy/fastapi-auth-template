@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -49,6 +50,8 @@ class Settings(BaseSettings):
             case_sensitive=False,
             env_nested_delimiter="__",
     )
+
+    mode: Literal["TEST", "DEV", "PROD"]
 
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
