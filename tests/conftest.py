@@ -15,6 +15,11 @@ async def prepare_database():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+    yield
+
+    async with database_manager.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
 
 @pytest.fixture(scope="function")
 def client():
