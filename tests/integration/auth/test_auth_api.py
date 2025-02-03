@@ -254,3 +254,51 @@ def test_refresh_access_token(
         )
         assert refresh_response.status_code == status_code
         assert refresh_response.json() == json_answer
+
+
+@pytest.mark.parametrize(
+    "username, password, email, status_code, json_answer",
+    [
+        (
+            "rodrigo",
+            "password",
+            "rodrigo@example.com",
+            status.HTTP_200_OK,
+            {"logout": "Success!"},
+        ),
+    ]
+)
+def test_logout(
+    client: TestClient,
+    username: str,
+    password: str,
+    email: str,
+    status_code: int,
+    json_answer: dict,
+):
+    signup_response = client.post(
+        url=f"{settings.api.prefix_v1}/registration/",
+        json={
+            "username": username,
+            "password": password,
+            "email": email,
+        }
+    )
+    assert signup_response.status_code == status.HTTP_201_CREATED
+
+    login_response = client.post(
+        url=f"{settings.api.prefix_v1}/login/",
+        data={
+            "username": username,
+            "password": password,
+        }
+    )
+    assert login_response.status_code == status.HTTP_200_OK
+
+    logout_response = client.post(
+        url=f"{settings.api.prefix_v1}/logout/",
+    )
+    assert logout_response.status_code == status_code
+    assert logout_response.json() == json_answer
+    assert client.cookies.get("access_token") is None
+    assert client.cookies.get("refresh_token") is None
