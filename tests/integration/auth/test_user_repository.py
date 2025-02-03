@@ -86,3 +86,49 @@ async def test_get_user(
     assert user_after_get.id == user_from_db.id
     assert user_after_get.username == username
     assert user_after_get.email == email
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email_prefix, add_n_times",
+    [
+        (
+            "benzema",
+            "password",
+            "benzema",
+            1,
+        ),
+        (
+            "ozil",
+            "password",
+            "ozil",
+            7,
+        ),
+        (
+            "ramos",
+            "pasword",
+            "ramos",
+            0,
+        ),
+    ]
+)
+async def test_get_all_user(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email_prefix: str,
+    add_n_times: int,
+):
+    users = await user_repo.get_all(db_session, {})
+    users_qty_before = len(users)
+    for i in range(add_n_times):
+        user = SUserSignUp(
+            username=f"{username}_{i}",
+            password=password.encode(),
+            email=f"{email_prefix}_{i}@example.com",  # noqa
+        )
+        await user_repo.add(db_session, user.model_dump())
+
+    users = await user_repo.get_all(db_session, {})
+    users_qty_after = len(users)
+    assert users_qty_before + add_n_times == users_qty_after
