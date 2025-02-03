@@ -268,3 +268,77 @@ async def test_delete_refresh_token(
     assert token_hash not in tokens_after
 
     assert len(tokens_before) - 1 == len(tokens_after)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "user_id, token_hash_prefix, iat, exp, device_info, add_n_times",
+    [
+        (
+            1,
+            "hash5",
+            1234567890,
+            1234567890 + 3600,
+            SDeviceInfo(
+                user_agent="Unique User-Agent/777.0",
+                ip_address="192.168.1.1",
+            ),
+            1,
+        ),
+        (
+            2,
+            "hash5",
+            1234567890,
+            1234567890 + 3600,
+            SDeviceInfo(
+                user_agent="Unique User-Agent/777.0",
+                ip_address="192.168.1.1",
+            ),
+            5,
+        ),
+        (
+            3,
+            "hash5",
+            1234567890,
+            1234567890 + 3600,
+            SDeviceInfo(
+                user_agent="Unique User-Agent/777.0",
+                ip_address="192.168.1.1",
+            ),
+            0,
+        ),
+    ]
+)
+async def test_get_tokens_by_device_info(
+    db_session: AsyncSession,
+    user_id: int,
+    token_hash_prefix: str,
+    iat: int,
+    exp: int,
+    device_info: SDeviceInfo,
+    add_n_times: int,
+):
+    all_users_in_db = await user_repo.get_all(db_session, {})
+    if len(all_users_in_db) < 10:
+        await _add_mock_users_to_db(db_session, 10)
+
+    for i in range(add_n_times):
+        refresh_token = SRefreshToken(
+            user_id=user_id,
+            token_hash=f"{token_hash_prefix}{i}",
+            created_at=iat,
+            expires_at=exp,
+            device_info=device_info,
+        )
+        await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    tokens_from_db = await refresh_token_repo.get_tokens_by_device_info(
+        db_session,
+        user_id,
+        device_info,
+    )
+
+    assert len(tokens_from_db) == add_n_times
+    for refresh_token in tokens_from_db:
+        assert refresh_token.user_id == user_id
+        assert refresh_token.device_info == device_info.model_dump()
