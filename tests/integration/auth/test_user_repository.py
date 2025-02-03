@@ -186,3 +186,40 @@ async def test_get_user_by_filter(
         {"email": typo_email},
     )
     assert none_from_db is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email",
+    [
+        (
+            "iniesta",
+            "password",
+            "iniesta@example.com",
+        ),
+    ]
+)
+async def test_delete_user(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    user_from_db = await user_repo.add(db_session, user.model_dump())
+
+    users_before = await user_repo.get_all(db_session, {})
+    users_before = [user.username for user in users_before]
+    assert username in users_before
+
+    await user_repo.delete(db_session, user_from_db.id)
+
+    users_after = await user_repo.get_all(db_session, {})
+    users_after = [user.username for user in users_after]
+    assert username not in users_after
+
+    assert len(users_before) - 1 == len(users_after)
