@@ -145,6 +145,9 @@ async def logout(
         await delete_refresh_token_from_db(db_session, refresh_token)
     response.delete_cookie(key="refresh_token")
     response.delete_cookie(key="access_token")
+    return {
+        "logout": "Success!",
+    }
 
 
 @router.get(
