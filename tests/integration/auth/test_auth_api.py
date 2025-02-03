@@ -26,6 +26,12 @@ class RefreshFailType(Enum):
     INVALID_TOKEN = 2
 
 
+class GetInfoFailType(Enum):
+    NO_FAIL = 0
+    NO_ACCESS_TOKEN = 1
+    INVALID_TOKEN = 2
+
+
 @pytest.mark.parametrize(
     "username, password, email, status_code, expected_response",
     [
@@ -302,3 +308,80 @@ def test_logout(
     assert logout_response.json() == json_answer
     assert client.cookies.get("access_token") is None
     assert client.cookies.get("refresh_token") is None
+
+
+@pytest.mark.parametrize(
+    "username, password, email, status_code, fail_type",
+    [
+        (
+            "andrew",
+            "password",
+            "andrew@example.com",
+            status.HTTP_200_OK,
+            GetInfoFailType.NO_FAIL,
+        ),
+        (
+            "martin",
+            "password",
+            "martin@example.com",
+            status.HTTP_401_UNAUTHORIZED,
+            GetInfoFailType.NO_ACCESS_TOKEN,
+        ),
+        (
+            "donald",
+            "password",
+            "donald@example.com",
+            status.HTTP_401_UNAUTHORIZED,
+            GetInfoFailType.INVALID_TOKEN,
+        ),
+    ]
+)
+def test_auth_user_get_info(
+    client: TestClient,
+    username: str,
+    password: str,
+    email: str,
+    status_code: int,
+    fail_type: GetInfoFailType,
+):
+    signup_response = client.post(
+        url=f"{settings.api.prefix_v1}/registration/",
+        json={
+            "username": username,
+            "password": password,
+            "email": email,
+        }
+    )
+    assert signup_response.status_code == status.HTTP_201_CREATED
+
+    login_response = client.post(
+        url=f"{settings.api.prefix_v1}/login/",
+        data={
+            "username": username,
+            "password": password,
+        }
+    )
+    assert login_response.status_code == status.HTTP_200_OK
+
+    expected_json_answer = None
+    if fail_type == GetInfoFailType.NO_FAIL:
+        expected_json_answer = {"username": username, "email": email}
+        get_info_response = client.get(
+            url=f"{settings.api.prefix_v1}/me/",
+        )
+        assert get_info_response.status_code == status_code
+        assert get_info_response.json() == expected_json_answer
+
+    else:
+        if fail_type == GetInfoFailType.NO_ACCESS_TOKEN:
+            expected_json_answer = {"detail": "Token not found."}
+            client.cookies.pop("access_token")
+        elif fail_type == GetInfoFailType.INVALID_TOKEN:
+            expected_json_answer = {"detail": "Invalid token."}
+            client.cookies.update({"access_token": "abcde"})
+
+        get_info_response = client.get(
+            url=f"{settings.api.prefix_v1}/me/",
+        )
+        assert get_info_response.status_code == status_code
+        assert get_info_response.json() == expected_json_answer
