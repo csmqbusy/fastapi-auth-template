@@ -52,3 +52,37 @@ async def test_add_user(
         added_user = users[-1]
         assert added_user.username == username
         assert added_user.email == email
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email",
+    [
+        (
+            "ronaldo",
+            "password",
+            "ronaldo@example.com",
+        ),
+        (
+            "henry",
+            "password",
+            "henry@example.com",
+        ),
+    ]
+)
+async def test_get_user(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    user_from_db = await user_repo.add(db_session, user.model_dump())
+    user_after_get = await user_repo.get(db_session, user_from_db.id)
+    assert user_after_get.id == user_from_db.id
+    assert user_after_get.username == username
+    assert user_after_get.email == email
