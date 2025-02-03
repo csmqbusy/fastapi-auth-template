@@ -126,6 +126,9 @@ async def refresh_access_token(
         httponly=True,
         samesite="lax"
     )
+    return {
+        "release_new_access_token": "Success!",
+    }
 
 
 @router.post(
