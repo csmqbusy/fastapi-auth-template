@@ -77,14 +77,14 @@ async def test_add_refresh_token(
     [
         (
             1,
-            "hash1",
+            "hash11",
             1234567890,
             1234567890 + 3600,
             SDeviceInfo(user_agent="Mozilla/5.0", ip_address="192.168.1.1"),
         ),
         (
             2,
-            "hash2",
+            "hash21",
             1234567890,
             1234567890 + 3600,
             SDeviceInfo(user_agent="Mozilla/5.0", ip_address="192.168.1.2"),
@@ -128,17 +128,17 @@ async def test_get_refresh_token(
     [
         (
             1,
-            "hash1",
+            "hash21",
             1,
         ),
         (
             2,
-            "hash2",
+            "hash22",
             9,
         ),
         (
             3,
-            "hash3",
+            "hash23",
             0,
         ),
     ]
@@ -177,7 +177,7 @@ async def test_get_all_refresh_token(
     [
         (
             1,
-            "unique_hash1",
+            "hash31",
             1234567890,
             1234567890 + 3600,
             SDeviceInfo(user_agent="Mozilla/5.0", ip_address="192.168.1.1"),
