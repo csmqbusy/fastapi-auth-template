@@ -16,8 +16,8 @@ async def create_user(user: SUserSignUp, session: AsyncSession) -> UserModel:
     if not (await _check_unique_email(user.email, session)):
         raise EmailAlreadyExists
 
-    user = await user_repo.add(session, user.model_dump())
-    return user
+    user_from_db = await user_repo.add(session, user.model_dump())
+    return user_from_db
 
 
 async def get_user_by_username(
