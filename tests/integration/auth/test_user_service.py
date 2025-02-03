@@ -1,7 +1,11 @@
+from contextlib import nullcontext
+from typing import ContextManager
+
 import pytest
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
 from app.models import UserModel
 from app.repositories import user_repo
 from app.schemes.user import SUserSignUp
@@ -9,6 +13,7 @@ from app.services.user import (
     _check_unique_username,
     _check_unique_email,
     get_user_by_username,
+    create_user,
 )
 
 
@@ -100,3 +105,53 @@ async def test_get_user_by_username(
     assert isinstance(user_from_db, UserModel)
     assert user_from_db.username == username
     assert user_from_db.email == email
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email, expectation",
+    [
+        (
+            "salah",
+            "password",
+            "salah@example.com",
+            nullcontext(),
+        ),
+        (
+            "salah",
+            "password",
+            "mosalah@example.com",
+            pytest.raises(UsernameAlreadyExists),
+        ),
+        (
+            "mosalah",
+            "password",
+            "salah@example.com",
+            pytest.raises(EmailAlreadyExists),
+        ),
+        (
+            "bergkamp",
+            "password",
+            "bergkamp@example.com",
+            nullcontext(),
+        ),
+    ]
+)
+async def test_add_user(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+    expectation: ContextManager,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    with expectation:
+        await create_user(user, db_session)
+        user_from_db = await get_user_by_username(user.username, db_session)
+        assert isinstance(user_from_db, UserModel)
+        assert user_from_db.username == username
+        assert user_from_db.email == email
