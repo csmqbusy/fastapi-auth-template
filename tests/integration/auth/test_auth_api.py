@@ -81,7 +81,7 @@ def test_sign_up_user(
 
 
 @pytest.mark.parametrize(
-    "username, password, email, status_code, fail_type",
+    "username, password, email, status_code, fail_type, json_answer",
     [
         (
             "daniel",
@@ -89,6 +89,7 @@ def test_sign_up_user(
             "daniel@example.com",
             status.HTTP_200_OK,
             LoginFailType.NO_FAIL,
+            {"sign_in": "Success!"}
         ),
         (
             "michael",
@@ -96,6 +97,7 @@ def test_sign_up_user(
             "michael@example.com",
             status.HTTP_401_UNAUTHORIZED,
             LoginFailType.USERNAME_ERROR,
+            {"detail": "Could not validate credentials."},
         ),
         (
             "alice",
@@ -103,6 +105,7 @@ def test_sign_up_user(
             "alice@example.com",
             status.HTTP_401_UNAUTHORIZED,
             LoginFailType.PASSWORD_ERROR,
+            {"detail": "Could not validate credentials."},
         ),
     ]
 )
@@ -113,6 +116,7 @@ def test_login(
     email: str,
     status_code: int,
     fail_type: LoginFailType,
+    json_answer: dict,
 ):
     signup_response = client.post(
         url=f"{settings.api.prefix_v1}/registration/",
@@ -135,7 +139,7 @@ def test_login(
             }
         )
         assert login_response.status_code == status_code
-        assert login_response.json() == {"sign_in": "Success!"}
+        assert login_response.json() == json_answer
         assert client.cookies.get("access_token") is not None
         assert client.cookies.get("refresh_token") is not None
 
@@ -155,6 +159,6 @@ def test_login(
             }
         )
         assert login_response.status_code == status_code
-        assert login_response.json() == {"detail": "Could not validate credentials."}
+        assert login_response.json() == json_answer
         assert client.cookies.get("access_token") is None
         assert client.cookies.get("refresh_token") is None
