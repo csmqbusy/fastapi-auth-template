@@ -112,7 +112,7 @@ async def test_get_user(
         ),
     ]
 )
-async def test_get_all_user(
+async def test_get_all_users(
     db_session: AsyncSession,
     username: str,
     password: str,
