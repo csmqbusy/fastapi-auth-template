@@ -143,7 +143,7 @@ async def test_get_refresh_token(
         ),
     ]
 )
-async def test_get_all_refresh_token(
+async def test_get_all_refresh_tokens(
     db_session: AsyncSession,
     user_id: int,
     token_hash: str,
