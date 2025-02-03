@@ -169,3 +169,54 @@ async def test_get_all_refresh_token(
     tokens = await refresh_token_repo.get_all(db_session, {})
     tokens_qty_after = len(tokens)
     assert tokens_qty_before + add_n_times == tokens_qty_after
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "user_id, token_hash, iat, exp, device_info, typo_token_hash, typo_user_id",
+    [
+        (
+            1,
+            "unique_hash1",
+            1234567890,
+            1234567890 + 3600,
+            SDeviceInfo(user_agent="Mozilla/5.0", ip_address="192.168.1.1"),
+            "hash_typo",
+            11111,
+        ),
+    ]
+)
+async def test_get_refresh_token_by_filter(
+    db_session: AsyncSession,
+    user_id: int,
+    token_hash: str,
+    iat: int,
+    exp: int,
+    device_info: SDeviceInfo,
+    typo_token_hash: str,
+    typo_user_id: int,
+):
+    all_users_in_db = await user_repo.get_all(db_session, {})
+    if len(all_users_in_db) < 10:
+        await _add_mock_users_to_db(db_session, 10)
+
+    refresh_token = SRefreshToken(
+        user_id=user_id,
+        token_hash=token_hash,
+        created_at=iat,
+        expires_at=exp,
+        device_info=device_info,
+    )
+    await refresh_token_repo.add(db_session, refresh_token.model_dump())
+    token_from_db = await refresh_token_repo.get_by_filter(
+        db_session,
+        {"token_hash": token_hash},
+    )
+    assert token_from_db.token_hash == token_hash
+    assert token_from_db.user_id == user_id
+
+    none_from_db = await refresh_token_repo.get_by_filter(
+        db_session,
+        {"token_hash": typo_token_hash},
+    )
+    assert none_from_db is None
