@@ -220,3 +220,51 @@ async def test_get_refresh_token_by_filter(
         {"token_hash": typo_token_hash},
     )
     assert none_from_db is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "user_id, token_hash, created_at, expires_at, device_info",
+    [
+        (
+            1,
+            "hash41",
+            1234567890,
+            1234567890 + 3600,
+            SDeviceInfo(user_agent="Mozilla/5.0", ip_address="192.168.1.1"),
+        ),
+    ]
+)
+async def test_delete_refresh_token(
+    db_session: AsyncSession,
+    user_id: int,
+    token_hash: str,
+    created_at: int,
+    expires_at: int,
+    device_info: SDeviceInfo,
+):
+    all_users_in_db = await user_repo.get_all(db_session, {})
+    if len(all_users_in_db) < 10:
+        await _add_mock_users_to_db(db_session, 10)
+
+    refresh_token = SRefreshToken(
+        user_id=user_id,
+        token_hash=token_hash,
+        created_at=created_at,
+        expires_at=expires_at,
+        device_info=device_info,
+    )
+    token_from_db = await refresh_token_repo.add(
+        db_session, refresh_token.model_dump())
+
+    tokens_before = await refresh_token_repo.get_all(db_session, {})
+    tokens_before = [token.token_hash for token in tokens_before]
+    assert token_hash in tokens_before
+
+    await refresh_token_repo.delete(db_session, token_from_db.id)
+
+    tokens_after = await refresh_token_repo.get_all(db_session, {})
+    tokens_after = [token.token_hash for token in tokens_after]
+    assert token_hash not in tokens_after
+
+    assert len(tokens_before) - 1 == len(tokens_after)
