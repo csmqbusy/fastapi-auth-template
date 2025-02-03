@@ -132,3 +132,57 @@ async def test_get_all_user(
     users = await user_repo.get_all(db_session, {})
     users_qty_after = len(users)
     assert users_qty_before + add_n_times == users_qty_after
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email, typo_username, typo_email",
+    [
+        (
+            "zidan",
+            "password",
+            "zidan@example.com",
+            "zidantypo",
+            "zidanetypo@example.com",
+        ),
+    ]
+)
+async def test_get_user_by_filter(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+    typo_username: str,
+    typo_email: EmailStr,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    await user_repo.add(db_session, user.model_dump())
+    user_from_db = await user_repo.get_by_filter(
+        db_session,
+        {"email": email},
+    )
+    assert user_from_db.username == username
+    assert user_from_db.email == email
+
+    user_from_db = await user_repo.get_by_filter(
+        db_session,
+        {"username": username},
+    )
+    assert user_from_db.username == username
+    assert user_from_db.email == email
+
+    none_from_db = await user_repo.get_by_filter(
+        db_session,
+        {"username": typo_username},
+    )
+    assert none_from_db is None
+
+    none_from_db = await user_repo.get_by_filter(
+        db_session,
+        {"email": typo_email},
+    )
+    assert none_from_db is None
