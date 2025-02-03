@@ -1,4 +1,7 @@
+from typing import AsyncGenerator
+
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.testclient import TestClient
 
 from app.core.config import settings
@@ -24,3 +27,9 @@ async def prepare_database():
 @pytest.fixture(scope="function")
 def client():
     yield TestClient(main_app)
+
+
+@pytest.fixture
+async def db_session() -> AsyncGenerator[AsyncSession, None]:
+    async for session in database_manager.get_session():
+        yield session
