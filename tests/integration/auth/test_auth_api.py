@@ -60,13 +60,13 @@ def test_sign_up_user(
     status_code: int,
     expected_response: RegistrationExpectedResponse,
 ):
-    expected_response_json = None
+    expected_json_answer = None
     if expected_response == RegistrationExpectedResponse.CREATED:
-        expected_response_json = {"username": username, "email": email}
+        expected_json_answer = {"username": username, "email": email}
     elif expected_response == RegistrationExpectedResponse.USERNAME_EXISTS:
-        expected_response_json = {"detail": "Username already exists."}
+        expected_json_answer = {"detail": "Username already exists."}
     elif expected_response == RegistrationExpectedResponse.EMAIL_EXISTS:
-        expected_response_json = {"detail": "Email already exists."}
+        expected_json_answer = {"detail": "Email already exists."}
 
     response = client.post(
         url=f"{settings.api.prefix_v1}/registration/",
@@ -77,7 +77,7 @@ def test_sign_up_user(
         }
     )
     assert response.status_code == status_code
-    assert response.json() == expected_response_json
+    assert response.json() == expected_json_answer
 
 
 @pytest.mark.parametrize(
