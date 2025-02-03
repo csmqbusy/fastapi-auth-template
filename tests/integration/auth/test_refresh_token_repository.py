@@ -120,3 +120,52 @@ async def test_get_refresh_token(
         token_after_get.device_info
     )
     assert device_info_from_db_scheme == device_info
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "user_id, token_hash, add_n_times",
+    [
+        (
+            1,
+            "hash1",
+            1,
+        ),
+        (
+            2,
+            "hash2",
+            9,
+        ),
+        (
+            3,
+            "hash3",
+            0,
+        ),
+    ]
+)
+async def test_get_all_refresh_token(
+    db_session: AsyncSession,
+    user_id: int,
+    token_hash: str,
+    add_n_times: int,
+):
+    all_users_in_db = await user_repo.get_all(db_session, {})
+    if len(all_users_in_db) < 10:
+        await _add_mock_users_to_db(db_session, 10)
+
+    tokens = await refresh_token_repo.get_all(db_session, {})
+    tokens_qty_before = len(tokens)
+    for i in range(add_n_times):
+        refresh_token = SRefreshToken(
+            user_id=user_id,
+            token_hash=token_hash,
+            created_at=1234567890,
+            expires_at=1234567890 + 3600,
+            device_info=SDeviceInfo(
+                user_agent="Mozilla/5.0", ip_address=f"192.168.1.4"),
+        )
+        await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    tokens = await refresh_token_repo.get_all(db_session, {})
+    tokens_qty_after = len(tokens)
+    assert tokens_qty_before + add_n_times == tokens_qty_after
