@@ -13,6 +13,7 @@ from app.services.refresh_token import (
     delete_refresh_token_from_db,
     _delete_all_user_auth_sessions,
     _delete_same_device_auth_sessions,
+    add_refresh_token_to_db,
 )
 
 
@@ -323,14 +324,14 @@ async def test_add_refresh_token_to_db__first_token(
     user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
     assert len(user_sessions) == 0
 
-    refresh_token = SRefreshToken(
+    await add_refresh_token_to_db(
+        session=db_session,
+        token=token,
         user_id=user_id,
-        token_hash=_hash_token(token),
         created_at=1234567890,
         expires_at=1234567890 + 3600,
-        device_info=SDeviceInfo(user_agent="Opera", ip_address="2.2.2")
+        device_info=SDeviceInfo(user_agent="Opera", ip_address="2.2.2"),
     )
-    await refresh_token_repo.add(db_session, refresh_token.model_dump())
 
     user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
     assert len(user_sessions) == 1
