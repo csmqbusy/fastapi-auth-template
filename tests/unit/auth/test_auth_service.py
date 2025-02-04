@@ -13,6 +13,8 @@ from app.services.auth import (
     decode_access_token,
     create_refresh_token,
     decode_refresh_token,
+    hash_password,
+    verify_password,
 )
 
 
@@ -92,3 +94,17 @@ def test_create_refresh_token(
     assert decoded_payload["sub"] == payload["sub"]
     assert decoded_payload["iat"] == iat
     assert decoded_payload["exp"] == exp
+
+
+@pytest.mark.parametrize(
+    "password",
+    [
+        "qwerty",
+    ]
+)
+def test_hash_password(
+    password: str,
+):
+    hashed_password = hash_password(password)
+    assert hashed_password is not None
+    assert verify_password(password, hashed_password)
