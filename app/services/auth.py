@@ -6,7 +6,6 @@ import jwt
 
 from app.core.config import settings
 
-
 SECONDS_IN_HOUR = 60 * 60 * 24
 
 

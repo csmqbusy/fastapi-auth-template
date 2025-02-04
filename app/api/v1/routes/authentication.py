@@ -17,7 +17,7 @@ from app.api.exceptions.authentication import (
     UsernameAlreadyExistsError,
     EmailAlreadyExistsError,
 )
-from app.auth.utils import (
+from app.services.auth import (
     hash_password,
     create_access_token,
     create_refresh_token,
