@@ -49,8 +49,8 @@ async def _delete_same_device_auth_sessions(
         device_info,
     )
     if same_device_auth_sessions:
-        for device in same_device_auth_sessions:
-            await refresh_token_repo.delete(session, device.id)
+        for auth_session in same_device_auth_sessions:
+            await refresh_token_repo.delete(session, auth_session.id)
 
 
 async def _delete_all_user_auth_sessions(
