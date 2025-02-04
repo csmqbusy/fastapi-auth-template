@@ -11,6 +11,7 @@ from app.services.refresh_token import (
     _hash_token,
     check_token_in_db,
     delete_refresh_token_from_db,
+    _delete_all_user_auth_sessions,
 )
 
 
@@ -153,3 +154,58 @@ async def test_delete_refresh_token_from_db(
 
     await delete_refresh_token_from_db(db_session, token)
     assert await check_token_in_db(db_session, token) is False
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email, token_prefix, add_n_times",
+    [
+        (
+            "neuer",
+            "password",
+            "neuer@example.com",
+            "neuer_token",
+            7,
+        ),
+        (
+            "robben",
+            "password",
+            "robben@example.com",
+            "robben_token",
+            0,
+        ),
+    ]
+)
+async def test__delete_all_user_auth_sessions(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+    token_prefix: str,
+    add_n_times: int,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    user_id = (await user_repo.add(db_session, user.model_dump())).id
+
+    for i in range(add_n_times):
+        token_hash = _hash_token(f"{token_prefix}_{i}")
+        refresh_token = SRefreshToken(
+            user_id=user_id,
+            token_hash=token_hash,
+            created_at=1234567890,
+            expires_at=1234567890 + 3600,
+            device_info=SDeviceInfo(user_agent="Mozilla", ip_address=f"1.{i}"),
+        )
+        await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == add_n_times
+
+    await _delete_all_user_auth_sessions(db_session, user_sessions)
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == 0
