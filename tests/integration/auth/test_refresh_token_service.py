@@ -292,3 +292,45 @@ async def test__delete_same_device_auth_sessions(
 
     user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
     assert len(user_sessions) == diff_tokens
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email, token",
+    [
+        (
+            "mbappe",
+            "password",
+            "mbappe@example.com",
+            "mbappe_token",
+        ),
+    ]
+)
+async def test_add_refresh_token_to_db__first_token(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+    token: str,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    user_id = (await user_repo.add(db_session, user.model_dump())).id
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == 0
+
+    refresh_token = SRefreshToken(
+        user_id=user_id,
+        token_hash=_hash_token(token),
+        created_at=1234567890,
+        expires_at=1234567890 + 3600,
+        device_info=SDeviceInfo(user_agent="Opera", ip_address="2.2.2")
+    )
+    await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == 1
