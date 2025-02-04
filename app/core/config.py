@@ -42,6 +42,7 @@ class JWTAuth(BaseModel):
     algorithm: str = "RS256"
     access_token_expires_sec: int = 900
     refresh_token_expires_days: int = 60
+    max_active_auth_sessions: int = 5
 
 
 class Settings(BaseSettings):

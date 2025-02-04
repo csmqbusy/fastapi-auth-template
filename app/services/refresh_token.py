@@ -2,6 +2,7 @@ import hashlib
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.models import RefreshTokenModel
 from app.repositories.refresh_token import refresh_token_repo
 from app.schemes.device_info import SDeviceInfo
@@ -18,7 +19,7 @@ async def add_refresh_token_to_db(
 ) -> None:
 
     all_user_sessions = await _get_all_user_auth_sessions(session, user_id)
-    if len(all_user_sessions) > 4:
+    if len(all_user_sessions) >= settings.auth.max_active_auth_sessions:
         await _delete_all_user_auth_sessions(session, all_user_sessions)
 
     await _delete_same_device_auth_sessions(session, user_id, device_info)
