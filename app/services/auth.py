@@ -6,7 +6,7 @@ import jwt
 
 from app.core.config import settings
 
-SECONDS_IN_HOUR = 60 * 60 * 24
+SECS_IN_HOUR = 60 * 60 * 24
 
 
 class TokenType(StrEnum):
@@ -108,7 +108,7 @@ def get_token_iat_and_exp(token_type: TokenType) -> dict[str, int]:
     if token_type == TokenType.ACCESS:
         time_to_live = settings.auth.access_token_expires_sec
     elif token_type == TokenType.REFRESH:
-        time_to_live = settings.auth.refresh_token_expires_days * SECONDS_IN_HOUR
+        time_to_live = settings.auth.refresh_token_expires_days * SECS_IN_HOUR
     else:
         raise ValueError("Invalid token type")
     expire = now + time_to_live
