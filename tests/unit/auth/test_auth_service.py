@@ -11,6 +11,8 @@ from app.services.auth import (
     SECS_IN_HOUR,
     create_access_token,
     decode_access_token,
+    create_refresh_token,
+    decode_refresh_token,
 )
 
 
@@ -64,6 +66,28 @@ def test_create_access_token(
     assert isinstance(token, str)
 
     decoded_payload = decode_access_token(token)
+    assert decoded_payload is not None
+    assert decoded_payload["sub"] == payload["sub"]
+    assert decoded_payload["iat"] == iat
+    assert decoded_payload["exp"] == exp
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"sub": "ronaldinho"},
+    ]
+)
+def test_create_refresh_token(
+    payload: dict,
+):
+    iat = int(datetime.now(UTC).timestamp())
+    exp = iat + 30000
+    token = create_refresh_token(payload, iat, exp)
+    assert token is not None
+    assert isinstance(token, str)
+
+    decoded_payload = decode_refresh_token(token)
     assert decoded_payload is not None
     assert decoded_payload["sub"] == payload["sub"]
     assert decoded_payload["iat"] == iat
