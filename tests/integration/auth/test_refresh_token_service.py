@@ -397,3 +397,108 @@ async def test_add_refresh_token_to_db__too_much_active_auth_sessions(
     assert len(user_sessions) == 1
 
     assert user_sessions[0].device_info == last_token_device_info.model_dump()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email, token, same_dev_info, diff_dev_info",
+    [
+        (
+            "saliba",
+            "password",
+            "saliba@example.com",
+            "saliba_token",
+            2,
+            1,
+        ),
+        (
+            "nketiah",
+            "password",
+            "nketiah@example.com",
+            "nketiah_token",
+            1,
+            3,
+        ),
+        (
+            "iwobi",
+            "password",
+            "iwobi@example.com",
+            "iwobi_token",
+            0,
+            4,
+        ),
+        (
+            "xhaka",
+            "password",
+            "xhaka@example.com",
+            "xhaka_token",
+            4,
+            0,
+        ),
+        (
+            "holding",
+            "password",
+            "holding@example.com",
+            "holding_token",
+            0,
+            0,
+        ),
+    ]
+)
+async def test_add_refresh_token_to_db__same_device_info(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+    token: str,
+    same_dev_info: int,
+    diff_dev_info: int,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    user_id = (await user_repo.add(db_session, user.model_dump())).id
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == 0
+
+    repeating_device_info = SDeviceInfo(
+        user_agent="Same device info",
+        ip_address="127.00.11",
+    )
+    for _ in range(same_dev_info):
+        refresh_token = SRefreshToken(
+            user_id=user_id,
+            token_hash=token,
+            created_at=1234567890,
+            expires_at=1234567890 + 3600,
+            device_info=repeating_device_info
+        )
+        await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    for i in range(diff_dev_info):
+        refresh_token = SRefreshToken(
+            user_id=user_id,
+            token_hash=token,
+            created_at=1234567890,
+            expires_at=1234567890 + 3600,
+            device_info=SDeviceInfo(user_agent="Opera", ip_address=f"1.1.{i}"),
+        )
+        await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == same_dev_info + diff_dev_info
+
+    await add_refresh_token_to_db(
+        session=db_session,
+        token=token,
+        user_id=user_id,
+        created_at=1234567890,
+        expires_at=1234567890 + 3600,
+        device_info=repeating_device_info,
+    )
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == diff_dev_info + 1
