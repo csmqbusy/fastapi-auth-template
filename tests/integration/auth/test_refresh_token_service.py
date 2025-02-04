@@ -2,6 +2,7 @@ import pytest
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.repositories import user_repo, refresh_token_repo
 from app.schemes.device_info import SDeviceInfo
 from app.schemes.refresh_token import SRefreshToken
@@ -335,3 +336,64 @@ async def test_add_refresh_token_to_db__first_token(
 
     user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
     assert len(user_sessions) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "username, password, email, token",
+    [
+        (
+            "arteta",
+            "password",
+            "arteta@example.com",
+            "arteta_token",
+        ),
+    ]
+)
+async def test_add_refresh_token_to_db__too_much_active_auth_sessions(
+    db_session: AsyncSession,
+    username: str,
+    password: str,
+    email: EmailStr,
+    token: str,
+):
+    user = SUserSignUp(
+        username=username,
+        password=password.encode(),
+        email=email,
+    )
+    user_id = (await user_repo.add(db_session, user.model_dump())).id
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == 0
+
+    for _ in range(settings.auth.max_active_auth_sessions):
+        refresh_token = SRefreshToken(
+            user_id=user_id,
+            token_hash=token,
+            created_at=1234567890,
+            expires_at=1234567890 + 3600,
+            device_info=SDeviceInfo(user_agent="Opera", ip_address="2.2.2")
+        )
+        await refresh_token_repo.add(db_session, refresh_token.model_dump())
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == settings.auth.max_active_auth_sessions
+
+    last_token_device_info = SDeviceInfo(
+        user_agent="Marked session",
+        ip_address="77.2.2",
+    )
+    await add_refresh_token_to_db(
+        session=db_session,
+        token=token,
+        user_id=user_id,
+        created_at=1234567890,
+        expires_at=1234567890 + 3600,
+        device_info=last_token_device_info,
+    )
+
+    user_sessions = await _get_all_user_auth_sessions(db_session, user_id)
+    assert len(user_sessions) == 1
+
+    assert user_sessions[0].device_info == last_token_device_info.model_dump()
