@@ -162,7 +162,7 @@ async def test_get_all_refresh_tokens(
             created_at=1234567890,
             expires_at=1234567890 + 3600,
             device_info=SDeviceInfo(
-                user_agent="Mozilla/5.0", ip_address=f"192.168.1.4"),
+                user_agent="Mozilla/5.0", ip_address="192.168.1.4"),
         )
         await refresh_token_repo.add(db_session, refresh_token.model_dump())
 
