@@ -1,6 +1,6 @@
 ### Info
 This is a version of the FastAPI application template (https://github.com/csmqbusy/fastapi-template)
-with the implemented functionality of authentication using cookies and JWT tokens.
+with the implemented functionality of authentication using cookies and JWT (JSON Web Tokens).
 
 ### Usage
 
