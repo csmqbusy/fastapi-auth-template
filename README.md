@@ -11,6 +11,7 @@ with the implemented functionality of authentication using cookies and JWT (JSON
 4. Rename `.env.dev.example` to `env.dev`
 5. mkdir `certs` in the root folder.
 6. Generate two pairs of secret keys (RSA256) in `certs` folder: `access_private.pem`, `access_public.pem`, `refresh_private.pem`, `refresh_public.pem`
+7. Apply migrations by the `alembic upgrade head` command.
 
 ### Optional
 
