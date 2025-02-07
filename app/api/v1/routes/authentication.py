@@ -32,7 +32,7 @@ from app.schemes.user import SUserSignUp, SUserShortInfo
 from app.services.refresh_token_service import (
     add_refresh_token_to_db, delete_refresh_token_from_db,
 )
-from app.services.user import create_user
+from app.services.user_service import create_user
 
 router = APIRouter()
 
