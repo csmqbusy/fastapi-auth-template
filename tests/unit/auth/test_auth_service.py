@@ -5,7 +5,7 @@ from typing import ContextManager
 import pytest
 
 from app.core.config import settings
-from app.services.auth import (
+from app.services.auth_service import (
     TokenType,
     get_token_iat_and_exp,
     SECS_IN_HOUR,

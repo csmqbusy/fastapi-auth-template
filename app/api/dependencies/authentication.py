@@ -3,7 +3,7 @@ from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from app.services.auth import (
+from app.services.auth_service import (
     verify_password,
     decode_refresh_token,
     decode_access_token,
