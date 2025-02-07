@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories import refresh_token_repo, user_repo
 from app.schemas.refresh_token import SRefreshToken
-from app.schemas.device_info import SDeviceInfo
+from app.schemas.device_info_schema import SDeviceInfo
 from app.schemas.user import SUserSignUp
 
 
