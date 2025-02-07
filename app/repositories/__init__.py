@@ -1,5 +1,5 @@
 from .user import user_repo
-from .refresh_token import refresh_token_repo
+from .refresh_token_repository import refresh_token_repo
 
 __all__ = [
     "user_repo",
