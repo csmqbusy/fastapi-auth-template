@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.models import RefreshTokenModel
 from app.repositories.refresh_token import refresh_token_repo
 from app.schemas.device_info_schema import SDeviceInfo
-from app.schemas.refresh_token import SRefreshToken
+from app.schemas.refresh_token_schema import SRefreshToken
 
 
 async def add_refresh_token_to_db(
