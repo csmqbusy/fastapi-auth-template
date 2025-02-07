@@ -28,7 +28,7 @@ from app.db import get_db_session
 from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
 from app.models import UserModel
 from app.schemas.device_info_schema import SDeviceInfo
-from app.schemas.user import SUserSignUp, SUserShortInfo
+from app.schemas.user_schemas import SUserSignUp, SUserShortInfo
 from app.services.refresh_token_service import (
     add_refresh_token_to_db, delete_refresh_token_from_db,
 )

@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.repositories import user_repo, refresh_token_repo
 from app.schemas.device_info_schema import SDeviceInfo
 from app.schemas.refresh_token_schema import SRefreshToken
-from app.schemas.user import SUserSignUp
+from app.schemas.user_schemas import SUserSignUp
 from app.services.refresh_token_service import (
     _get_all_user_auth_sessions,
     _hash_token,

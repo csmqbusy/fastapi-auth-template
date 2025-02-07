@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories import refresh_token_repo, user_repo
 from app.schemas.refresh_token_schema import SRefreshToken
 from app.schemas.device_info_schema import SDeviceInfo
-from app.schemas.user import SUserSignUp
+from app.schemas.user_schemas import SUserSignUp
 
 
 async def _add_mock_users_to_db(db_session: AsyncSession, qty: int) -> None:
