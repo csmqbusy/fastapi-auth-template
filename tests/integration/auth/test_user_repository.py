@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import ContextManager
 
 from app.repositories import user_repo
-from app.schemes.user import SUserSignUp
+from app.schemas.user import SUserSignUp
 
 
 @pytest.mark.asyncio

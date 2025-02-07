@@ -2,9 +2,9 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories import refresh_token_repo, user_repo
-from app.schemes.refresh_token import SRefreshToken
-from app.schemes.device_info import SDeviceInfo
-from app.schemes.user import SUserSignUp
+from app.schemas.refresh_token import SRefreshToken
+from app.schemas.device_info import SDeviceInfo
+from app.schemas.user import SUserSignUp
 
 
 async def _add_mock_users_to_db(db_session: AsyncSession, qty: int) -> None:

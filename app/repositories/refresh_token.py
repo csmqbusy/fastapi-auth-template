@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.refresh_token import RefreshTokenModel
 from app.repositories.base import BaseRepository
-from app.schemes.device_info import SDeviceInfo
+from app.schemas.device_info import SDeviceInfo
 
 
 class RefreshTokenRepository(BaseRepository[RefreshTokenModel]):

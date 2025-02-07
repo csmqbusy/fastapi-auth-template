@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.schemes.device_info import SDeviceInfo
+from app.schemas.device_info import SDeviceInfo
 
 
 class SRefreshToken(BaseModel):

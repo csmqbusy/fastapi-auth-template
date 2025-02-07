@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
 from app.models import UserModel
 from app.repositories import user_repo
-from app.schemes.user import SUserSignUp
+from app.schemas.user import SUserSignUp
 from app.services.user_service import (
     _check_unique_username,
     _check_unique_email,

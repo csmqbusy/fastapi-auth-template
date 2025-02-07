@@ -7,7 +7,7 @@ from app.exceptions.user import (
 )
 from app.models import UserModel
 from app.repositories import user_repo
-from app.schemes.user import SUserSignUp
+from app.schemas.user import SUserSignUp
 
 
 async def create_user(user: SUserSignUp, session: AsyncSession) -> UserModel:

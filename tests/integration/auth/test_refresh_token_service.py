@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.repositories import user_repo, refresh_token_repo
-from app.schemes.device_info import SDeviceInfo
-from app.schemes.refresh_token import SRefreshToken
-from app.schemes.user import SUserSignUp
+from app.schemas.device_info import SDeviceInfo
+from app.schemas.refresh_token import SRefreshToken
+from app.schemas.user import SUserSignUp
 from app.services.refresh_token_service import (
     _get_all_user_auth_sessions,
     _hash_token,

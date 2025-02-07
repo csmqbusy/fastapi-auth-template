@@ -10,7 +10,7 @@ from app.services.auth_service import (
 )
 from app.db import get_db_session
 from app.models import UserModel
-from app.schemes.device_info import SDeviceInfo
+from app.schemas.device_info import SDeviceInfo
 from app.services.refresh_token_service import check_token_in_db
 from app.services.user_service import get_user_by_username
 from app.api.exceptions.authentication import (
