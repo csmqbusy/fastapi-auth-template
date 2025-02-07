@@ -7,7 +7,7 @@ from fastapi import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies.authentication import (
+from app.api.dependencies.auth_dependencies import (
     validate_credentials,
     get_active_auth_user_info,
     get_device_info,
