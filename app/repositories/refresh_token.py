@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.refresh_token import RefreshTokenModel
-from app.repositories.base import BaseRepository
+from app.repositories.base_repository import BaseRepository
 from app.schemas.device_info_schema import SDeviceInfo
 
 
