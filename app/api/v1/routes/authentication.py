@@ -25,7 +25,7 @@ from app.services.auth_service import (
     TokenType,
 )
 from app.db import get_db_session
-from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
+from app.exceptions.user_exceptions import UsernameAlreadyExists, EmailAlreadyExists
 from app.models import UserModel
 from app.schemas.device_info_schema import SDeviceInfo
 from app.schemas.user_schemas import SUserSignUp, SUserShortInfo

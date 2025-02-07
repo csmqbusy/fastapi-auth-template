@@ -1,7 +1,7 @@
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.user import (
+from app.exceptions.user_exceptions import (
     UsernameAlreadyExists,
     EmailAlreadyExists,
 )

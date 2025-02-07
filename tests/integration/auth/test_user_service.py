@@ -5,7 +5,7 @@ import pytest
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.user import UsernameAlreadyExists, EmailAlreadyExists
+from app.exceptions.user_exceptions import UsernameAlreadyExists, EmailAlreadyExists
 from app.models import UserModel
 from app.repositories import user_repo
 from app.schemas.user_schemas import SUserSignUp
