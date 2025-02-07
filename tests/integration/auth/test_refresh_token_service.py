@@ -7,7 +7,7 @@ from app.repositories import user_repo, refresh_token_repo
 from app.schemes.device_info import SDeviceInfo
 from app.schemes.refresh_token import SRefreshToken
 from app.schemes.user import SUserSignUp
-from app.services.refresh_token import (
+from app.services.refresh_token_service import (
     _get_all_user_auth_sessions,
     _hash_token,
     check_token_in_db,
