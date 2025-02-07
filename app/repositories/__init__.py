@@ -1,4 +1,4 @@
-from .user import user_repo
+from .user_repository import user_repo
 from .refresh_token_repository import refresh_token_repo
 
 __all__ = [
