@@ -13,7 +13,7 @@ from app.models import UserModel
 from app.schemas.device_info_schema import SDeviceInfo
 from app.services.refresh_token_service import check_token_in_db
 from app.services.user_service import get_user_by_username
-from app.api.exceptions.authentication import (
+from app.api.exceptions.auth_exceptions import (
     InvalidCredentialsError,
     TokenNotFoundError,
     InvalidTokenException,

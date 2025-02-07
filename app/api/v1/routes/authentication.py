@@ -13,7 +13,7 @@ from app.api.dependencies.auth_dependencies import (
     get_device_info,
     get_valid_refresh_token_payload,
 )
-from app.api.exceptions.authentication import (
+from app.api.exceptions.auth_exceptions import (
     UsernameAlreadyExistsError,
     EmailAlreadyExistsError,
 )
